@@ -1,0 +1,21 @@
+# Core backend
+fastapi
+uvicorn[standard]
+sqlalchemy
+python-multipart
+
+# Data processing & forecasting
+pandas
+numpy
+scikit-learn
+scipy
+statsmodels
+
+# Excel / file handling
+openpyxl
+xlrd
+
+# Utilities
+pydantic
+jinja2
+requests
