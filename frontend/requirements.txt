@@ -1,0 +1,8 @@
+# Frontend
+streamlit
+altair
+plotly
+pydeck
+requests
+pandas
+numpy
