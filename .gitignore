@@ -6,7 +6,7 @@ __pycache__/
 *.db
 
 # Virtual env
-myenv/
+.venv/
 
 # IDE
 .vscode/
