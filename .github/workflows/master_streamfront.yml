@@ -34,7 +34,7 @@ jobs:
     needs: build
     permissions:
       contents: read
-      id-token: write    
+      id-token: write
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -47,10 +47,13 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_72EC6246679B479AA09842692CDDF2B5 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_6AE5003C15094098820B5128ACD5D556 }}
 
+      # (Optional) wait a bit so SCM restart doesn’t kill deployment
+      - name: Wait before deploy
+        run: sleep 15
+
       - name: Deploy to Azure
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'StreamFront'
           slot-name: 'Production'
-          package: .
-
+          package: python-app
