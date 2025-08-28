@@ -56,4 +56,5 @@ jobs:
         with:
           app-name: 'StreamFront'
           slot-name: 'Production'
-          package: python-app
+          package: .
+
