@@ -1,4 +1,3 @@
-# streamlit_app.py - Updated Frontend with Backend Integration
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -334,7 +333,7 @@ def main():
                     showlegend=True
                 )
                 
-                st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, width="stretch")
             
             elif analysis_type == "Distribution":
                 # Distribution analysis
@@ -360,7 +359,7 @@ def main():
                     height=400
                 )
                 
-                st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, width="stretch")
             
             elif analysis_type == "Correlation":
                 # Correlation analysis
@@ -376,7 +375,7 @@ def main():
                     )
                     
                     fig.update_layout(height=500)
-                    st.plotly_chart(fig, use_container_width=True)
+                    st.plotly_chart(fig, width="stretch")
                 else:
                     st.info("Please select at least 2 categories for correlation analysis.")
             
@@ -413,7 +412,7 @@ def main():
                     )
                 )
                 
-                st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, width="stretch")
             
             elif analysis_type == "Trend Analysis":
                 # Trend analysis with moving averages
@@ -448,7 +447,7 @@ def main():
                     hovermode='x unified'
                 )
                 
-                st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, width="stretch")
         
         # Summary statistics
         if selected_categories and summary_stats:
@@ -471,7 +470,7 @@ def main():
             
             if stats_data:
                 stats_df = pd.DataFrame(stats_data).T
-                st.dataframe(stats_df, use_container_width=True)
+                st.dataframe(stats_df, width="stretch")
         
         # Category-specific details
         if selected_categories:
@@ -524,40 +523,40 @@ def main():
             prediction_months = st.slider(
                 "Forecast Period (Months)",
                 min_value=1,
-                max_value=24,
-                value=12,
+                max_value=36,
+                value=24,
                 help="Number of months to forecast"
             )
         
         with col3:
             confidence_level = 95 / 100
         # Model information expander
-        with st.expander("ℹ️ About the ARIMA Model"):
-            st.markdown("""
-            **ARIMA (AutoRegressive Integrated Moving Average) Model Features:**
+        # with st.expander("ℹ️ About the ARIMA Model"):
+        #     st.markdown("""
+        #     **ARIMA (AutoRegressive Integrated Moving Average) Model Features:**
             
-            - ✅ **Automatic Stationarity Testing**: Uses ADF and KPSS tests for stationarity detection
-            - ✅ **Data Transformation**: Applies differencing and other transformations as needed
-            - ✅ **Parameter Optimization**: Automatically selects optimal ARIMA parameters (p,d,q) using AIC
-            - ✅ **Model Validation**: Performs residual analysis and calculates performance metrics
-            - ✅ **Seasonality Detection**: Identifies and models seasonal patterns in the data
-            - ✅ **Real-time Processing**: Models are retrained when new data is uploaded
+        #     - ✅ **Automatic Stationarity Testing**: Uses ADF and KPSS tests for stationarity detection
+        #     - ✅ **Data Transformation**: Applies differencing and other transformations as needed
+        #     - ✅ **Parameter Optimization**: Automatically selects optimal ARIMA parameters (p,d,q) using AIC
+        #     - ✅ **Model Validation**: Performs residual analysis and calculates performance metrics
+        #     - ✅ **Seasonality Detection**: Identifies and models seasonal patterns in the data
+        #     - ✅ **Real-time Processing**: Models are retrained when new data is uploaded
             
-            **Performance Metrics:**
-            - **MAME**: Mean Absolute Error(lower is better)
-            - **RMSE**: Root Mean Square Error (lower is better)
-            """)
+        #     **Performance Metrics:**
+        #     - **MAME**: Mean Absolute Error(lower is better)
+        #     - **RMSE**: Root Mean Square Error (lower is better)
+        #     """)
         
         # Generate Forecast button
         if st.button("🚀 Generate Forecast", type="primary"):
-            with st.spinner("Running ARIMA model analysis... Please wait"):
+            with st.spinner("Running Forecasting model... Please wait"):
                 success, result = get_predictions_from_api(pred_category, prediction_months, confidence_level)
                 
                 if success:
                     # Extract prediction data
                     predictions = result['predictions']
                     dates = result['dates']
-                    metrics = result['metrics']
+                    #metrics = result['metrics']
                     
                     # Create prediction visualization
                     fig = go.Figure()
@@ -600,7 +599,7 @@ def main():
                         showlegend=True
                     )
                     
-                    st.plotly_chart(fig, use_container_width=True)
+                    st.plotly_chart(fig, width="stretch")
                     
                     # Prediction summary and metrics
                     col1, col2 = st.columns(2)
@@ -617,72 +616,72 @@ def main():
                         if not df.empty:
                             historical_avg = df[pred_category].tail(12).mean()
                             growth_rate = ((avg_prediction - historical_avg) / historical_avg) * 100 if historical_avg > 0 else 0
-                            predicted_nextmonth_sales = predictions[0]
-                            sales_diff_predicated = predictions[0] - historical_avg
+                            # predicted_nextmonth_sales = predictions[24]
+                            # sales_diff_predicated = predictions[0] - historical_avg
 
                             st.metric("Historical 12-Month Average", f"{historical_avg:.0f}")
                             st.metric("Predicted Growth Rate", f"{growth_rate:+.1f}%")
-                            st.metric("Predicted Next Month",f"{predicted_nextmonth_sales:.0f}",delta=f"{sales_diff_predicated:+.0f}"
-)
-                    with col2:
-                        st.subheader("🎯 Model Performance")
+                            #st.metric("Predicted Next Month",f"{predicted_nextmonth_sales:.0f}",delta=f"{sales_diff_predicated:+.0f}")
+                #     with col2:
+                #         st.subheader("🎯 Model Performance")
 
-                        # ARIMA order (taken directly from result, not metrics)
-                        arima_order = result.get('arima_order', [0, 0, 0])
-                        st.info(f"**ARIMA Order**: ({arima_order[0]}, {arima_order[1]}, {arima_order[2]})")
+                #         # ARIMA order (taken directly from result, not metrics)
+                #         arima_order = result.get('arima_order', [0, 0, 0])
+                #         st.info(f"**ARIMA Order**: ({arima_order[0]}, {arima_order[1]}, {arima_order[2]})")
 
-                        # Performance metrics
-                        mae = metrics.get('mae', 0)
-                        rmse = metrics.get('rmse', 0)
+                #         # Performance metrics
+                #         metrics = result.get('metrics', {})  # Use empty dict if key missing
+                #         mae = metrics.get('MAE', 0)          # Note: keys from API are 'MAE', 'RMSE'
+                #         rmse = metrics.get('RMSE', 0)
 
-                        col2_1, col2_2 = st.columns(2)
-                        with col2_1:
-                            st.metric("MAE", f"{mae:.2f}")
+                #         col2_1, col2_2 = st.columns(2)
+                #         with col2_1:
+                #             st.metric("MAE", f"{mae:.2f}")
 
-                        with col2_2:
-                            st.metric("RMSE", f"{rmse:.2f}")
+                #         with col2_2:
+                #             st.metric("RMSE", f"{rmse:.2f}")
 
                         
-                        # Model validation
-                        model_valid = metrics.get('model_valid', True)
-                        validation_status = "✅ Valid" if model_valid else "⚠️ Check residuals"
-                        st.info(f"**Model Validation**: {validation_status}")
+                #         # Model validation
+                #         model_valid = metrics.get('model_valid', True)
+                #         validation_status = "✅ Valid" if model_valid else "⚠️ Check residuals"
+                #         st.info(f"**Model Validation**: {validation_status}")
                     
-                    # Detailed predictions table
-                    with st.expander("📊 Detailed Forecast"):
-                        pred_df = pd.DataFrame({
-                            'Date': dates,
-                            'Predicted Quantity': [f"{p:.2f}" for p in predictions],
-                        })
-                        st.dataframe(pred_df, use_container_width=True)
+                #     # Detailed predictions table
+                #     with st.expander("📊 Detailed Forecast"):
+                #         pred_df = pd.DataFrame({
+                #             'Date': dates,
+                #             'Predicted Quantity': [f"{p:.2f}" for p in predictions],
+                #         })
+                #         st.dataframe(pred_df, use_container_width=True)
                     
-                    # Download predictions
-                    csv_data = pd.DataFrame({
-                        'date': dates,
-                        'predicted_quantity': predictions,
+                #     # Download predictions
+                #     csv_data = pd.DataFrame({
+                #         'date': dates,
+                #         'predicted_quantity': predictions,
                         
-                    })
+                #     })
                     
-                    csv_string = csv_data.to_csv(index=False)
-                    st.download_button(
-                        label="📥 Download Forecast (CSV)",
-                        data=csv_string,
-                        file_name=f"{pred_category}_predictions_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
-                        mime="text/csv",
-                        use_container_width=True
-                    )
+                #     csv_string = csv_data.to_csv(index=False)
+                #     st.download_button(
+                #         label="📥 Download Forecast (CSV)",
+                #         data=csv_string,
+                #         file_name=f"{pred_category}_predictions_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
+                #         mime="text/csv",
+                #         use_container_width=True
+                #     )
                     
-                else:
-                    error_msg = result.get('error', 'Unknown error occurred')
-                    st.error(f"❌ Error generating Forecast: {error_msg}")
+                # else:
+                #     error_msg = result.get('error', 'Unknown error occurred')
+                #     st.error(f"❌ Error generating Forecast: {error_msg}")
                     
-                    # Provide helpful suggestions based on common errors
-                    if "insufficient" in error_msg.lower():
-                        st.info("💡 **Tip**: ARIMA models require at least 24 data points. Please upload more historical data.")
-                    elif "category" in error_msg.lower():
-                        st.info("💡 **Tip**: Make sure the selected category exists in your uploaded data.")
-                    elif "stationary" in error_msg.lower():
-                        st.info("💡 **Tip**: The data might have complex patterns. Try uploading more recent data or check for outliers.")
+                #     # Provide helpful suggestions based on common errors
+                #     if "insufficient" in error_msg.lower():
+                #         st.info("💡 **Tip**: ARIMA models require at least 24 data points. Please upload more historical data.")
+                #     elif "category" in error_msg.lower():
+                #         st.info("💡 **Tip**: Make sure the selected category exists in your uploaded data.")
+                #     elif "stationary" in error_msg.lower():
+                #         st.info("💡 **Tip**: The data might have complex patterns. Try uploading more recent data or check for outliers.")
 
 if __name__ == "__main__":
     main()
