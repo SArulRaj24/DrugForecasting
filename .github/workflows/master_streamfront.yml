@@ -12,8 +12,10 @@ jobs:
     permissions:
       contents: read
       id-token: write
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -23,10 +25,10 @@ jobs:
       - name: Install dependencies
         run: pip install -r frontend/requirements.txt
 
-      - name: Upload artifact
+      - name: Upload frontend artifact
         uses: actions/upload-artifact@v4
         with:
-          name: python-app
+          name: frontend-app
           path: frontend/
 
   deploy:
@@ -35,10 +37,13 @@ jobs:
     permissions:
       contents: read
       id-token: write
+
     steps:
-      - uses: actions/download-artifact@v4
+      - name: Download frontend artifact
+        uses: actions/download-artifact@v4
         with:
-          name: python-app
+          name: frontend-app
+          path: .
 
       - name: Azure Login
         uses: azure/login@v2
@@ -47,14 +52,13 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_72EC6246679B479AA09842692CDDF2B5 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_6AE5003C15094098820B5128ACD5D556 }}
 
-      # (Optional) wait a bit so SCM restart doesn’t kill deployment
+      # Delay to avoid SCM restart killing deployment
       - name: Wait before deploy
-        run: sleep 15
+        run: sleep 20
 
-      - name: Deploy to Azure
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'StreamFront'
           slot-name: 'Production'
           package: .
-
