@@ -5,40 +5,71 @@ This project is a Python application that utilizes Streamlit for the frontend an
 
 ## Project Structure
 ```
-my-python-streamlit-app
-├── backend
-│   ├── main.py                # Entry point for the backend application
-│   ├── models
-│   │   └── arima_model.py     # Implementation of the ARIMA model
-│   ├── database
-│   │   └── db_manager.py      # Database management operations
-│   └── utils
-│       ├── data_processor.py   # Data processing functions
-│   
-├── frontend
-│   └── streamlit_app.py       # Streamlit frontend application
-└── README.md                  # Project documentation
+
+.
+├── .github/                 # GitHub Actions workflows for CI/CD
+├── backend/                 # Backend services
+│   ├── database/            # Database management scripts
+│   │   └── db_manager.py    # Manages database connections and operations
+│   ├── models/              # Pre-trained machine learning models (.pkl files)
+│   │   ├── M01AB_model.pkl
+│   │   ├── ...
+│   ├── utils/               # Utility scripts
+│   │   ├── data_processor.py  # Data preprocessing
+│   │   ├── model_loader.py    # Loads machine learning models
+│   │   └── main.py          # Main backend application entry point
+│   └── requirements.txt     # Python dependencies for the backend
+├── frontend/                # Frontend application
+│   ├── app.py               # Main frontend entry point (e.g., Streamlit, Flask)
+│   └── requirements.txt     # Python dependencies for the frontend
+├── .gitignore               # Files and directories to be ignored by Git
+└── README.md                # Project overview and documentation
 ```
+---
 
-## Setup Instructions
-1. Clone the repository:
-   ```
-   git clone <repository-url>
-   cd my-python-streamlit-app
-   ```
+## 🚀 Getting Started
 
-2. Install the required packages:
-   ```
-   pip install -r requirements.txt
-   ```
+### Prerequisites
 
-3. Set up the database (if applicable) and configure the connection settings in `backend/database/db_manager.py`.
+To run this project, you'll need **Python 3.8+**.
 
-## Usage
-To run the backend application, execute:
-```
-uvicorn main:app --reload --port 8000
-```
+### Installation
+
+1.  **Clone the repository:**
+    ```bash
+    git clone [repository-url]
+    cd [repository-name]
+    ```
+
+2.  **Set up the backend:**
+    ```bash
+    cd backend
+    pip install -r requirements.txt
+    ```
+
+3.  **Set up the frontend:**
+    ```bash
+    cd ../frontend
+    pip install -r requirements.txt
+    ```
+
+### Running the Application
+
+1.  **Start the backend server:**
+    ```bash
+    uvicorn main:app --reload --port 8000
+    ```
+
+2.  **Start the frontend application:**
+    ```bash
+    cd ../../frontend
+    streamlit run app.py
+    ```
+---
+
+## ✍️ Contribution
+
+If you want to contribute, please fork the repository and create a pull request.
 
 To launch the Streamlit frontend, run:
 ```
