@@ -17,7 +17,7 @@ This project is a Python application that utilizes Streamlit for the frontend an
 │   ├── utils/               # Utility scripts
 │   │   ├── data_processor.py  # Data preprocessing
 │   │   ├── model_loader.py    # Loads machine learning models
-│   │   └── main.py          # Main backend application entry point
+│   │── main.py          # Main backend application entry point  
 │   └── requirements.txt     # Python dependencies for the backend
 ├── frontend/                # Frontend application
 │   ├── app.py               # Main frontend entry point (e.g., Streamlit, Flask)
