@@ -9,6 +9,7 @@ import pandas as pd
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+#from models import TransformerMode
 
 from database.db_manager import init_db, upsert_monthly_records, fetch_categories, fetch_monthly_records, fetch_series
 from utils.data_processor import parse_upload_to_monthly_long, pivot_wide, summarize_wide
@@ -76,7 +77,6 @@ def get_data(start_date: Optional[str] = None, end_date: Optional[str] = None, c
 
     return {"data": wide_out.to_dict(orient="records"), "summary_stats": summary, "categories": fetch_categories()}
 
-
 @app.post("/api/upload")
 def upload(file: UploadFile = File(...)) -> Dict[str, Any]:
     content = file.file.read()
@@ -86,10 +86,7 @@ def upload(file: UploadFile = File(...)) -> Dict[str, Any]:
     monthly_long = parse_upload_to_monthly_long(filename=file.filename or "", content=content)
     inserted = upsert_monthly_records(monthly_long)
     cats = fetch_categories()
-    return {
-        "message": f"Ingested {inserted} monthly records across {monthly_long['category'].nunique()} categories.",
-        "categories": cats
-    }
+    return {"message": f"Ingested {inserted} monthly records across {monthly_long['category'].nunique()} categories.", "categories": cats}
 
 
 @app.post("/api/predict")
@@ -101,32 +98,47 @@ def predict(req: PredictRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error loading model: {e}")
 
+    # Fetch historical data
     y = fetch_series(req.category)
     if y.empty:
         raise HTTPException(status_code=404, detail=f"No historical data found for category {req.category}")
+
     last_date = y.index[-1]
+    history_len = len(y)
 
     if model_type == "prophet":
+        # Prophet: predict only future
         future = model.make_future_dataframe(periods=req.periods, freq="M")
         forecast = model.predict(future)
-        forecast_tail = forecast.tail(req.periods)
-        dates = forecast_tail["ds"].dt.strftime("%Y-%m-%d").tolist()
-        preds = forecast_tail["yhat"].tolist()
+
+        # Take only future predictions
+        future_forecast = forecast.tail(req.periods)
+        dates = future_forecast["ds"].dt.strftime("%Y-%m-%d").tolist()
+        preds = future_forecast["yhat"].tolist()
 
     elif model_type in ["arima", "sarima"]:
-        fc_trans = model.forecast(steps=req.periods)
+        # ARIMA/SARIMA: include last historical + future
+        start_idx = max(0, history_len - req.periods)
+        end_idx = history_len + req.periods - 1
+
+        preds_obj = model.get_prediction(start=start_idx, end=end_idx)
+        preds_mean = preds_obj.predicted_mean
 
         if transformer is not None:
-            preds = transformer.inverse_transform(fc_trans.to_numpy().reshape(-1, 1)).flatten()
+            preds = transformer.inverse_transform(
+                preds_mean.to_numpy().reshape(-1, 1)
+            ).flatten()
         else:
-            preds = fc_trans.to_numpy().flatten()
+            preds = preds_mean.to_numpy().flatten()
 
+        # Dates: last req.periods historical + req.periods future
+        past_dates = y.index[-req.periods:]
         future_dates = pd.date_range(
             last_date + pd.offsets.MonthBegin(1),
             periods=req.periods,
             freq="MS"
         )
-        dates = [d.strftime("%Y-%m-%d") for d in future_dates]
+        dates = [d.strftime("%Y-%m-%d") for d in past_dates.tolist() + future_dates.tolist()]
 
     else:
         raise HTTPException(status_code=400, detail=f"Unsupported model type: {model_type}")
@@ -136,6 +148,8 @@ def predict(req: PredictRequest):
         "dates": dates,
         "predictions": [float(x) for x in preds]
     }
+
+
 
 
 @app.get("/api/stats/{category}")
