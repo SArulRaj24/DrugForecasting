@@ -647,29 +647,29 @@ def main():
                 #         validation_status = "✅ Valid" if model_valid else "⚠️ Check residuals"
                 #         st.info(f"**Model Validation**: {validation_status}")
                     
-                #     # Detailed predictions table
-                #     with st.expander("📊 Detailed Forecast"):
-                #         pred_df = pd.DataFrame({
-                #             'Date': dates,
-                #             'Predicted Quantity': [f"{p:.2f}" for p in predictions],
-                #         })
-                #         st.dataframe(pred_df, use_container_width=True)
+                    # Detailed predictions table
+                    with st.expander("📊 Detailed Forecast"):
+                        pred_df = pd.DataFrame({
+                            'Date': dates,
+                            'Predicted Quantity': [f"{p:.2f}" for p in predictions],
+                        })
+                        st.dataframe(pred_df, use_container_width=True)
                     
-                #     # Download predictions
-                #     csv_data = pd.DataFrame({
-                #         'date': dates,
-                #         'predicted_quantity': predictions,
+                    # Download predictions
+                    csv_data = pd.DataFrame({
+                        'date': dates,
+                        'predicted_quantity': predictions,
                         
-                #     })
+                    })
                     
-                #     csv_string = csv_data.to_csv(index=False)
-                #     st.download_button(
-                #         label="📥 Download Forecast (CSV)",
-                #         data=csv_string,
-                #         file_name=f"{pred_category}_predictions_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
-                #         mime="text/csv",
-                #         use_container_width=True
-                #     )
+                    csv_string = csv_data.to_csv(index=False)
+                    st.download_button(
+                        label="📥 Download Forecast (CSV)",
+                        data=csv_string,
+                        file_name=f"{pred_category}_predictions_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
+                        mime="text/csv",
+                        use_container_width=True
+                    )
                     
                 # else:
                 #     error_msg = result.get('error', 'Unknown error occurred')
