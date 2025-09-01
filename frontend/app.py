@@ -18,7 +18,7 @@ st.set_page_config(
 )
 
 # Configuration
-API_BASE_URL = "http://localhost:8000"  # Change this to your backend URL
+API_BASE_URL = "https://backendmodel-c2bredcaa2eddcb7.centralindia-01.azurewebsites.net"  # Change this to your backend URL
 
 # Custom CSS for better styling     
 st.markdown("""
